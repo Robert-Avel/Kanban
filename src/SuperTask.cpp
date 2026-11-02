@@ -1,12 +1,22 @@
 #include "SuperTask.hpp"
 
+bool kb::SuperTask::duplicated(const std::string& title) {
+    for(auto& t: sub_tsk) {
+        if (t.getTitle() == title) {
+            return true;
+        }
+    }
+    return false;
+}
 
-const kb::Task* kb::SuperTask::getTask(size_t index) const {
+
+kb::Task* kb::SuperTask::getTask(size_t index) {
     if(index >= sub_tsk.size()) {return nullptr;}
     return &sub_tsk.at(index);
 }
 
-const kb::Task* kb::SuperTask::getTask(std::string title) const {
+
+kb::Task* kb::SuperTask::getTask(std::string title) {
     for(auto& t: sub_tsk) {
         if (t.getTitle() == title) {
             return &t;
@@ -24,9 +34,7 @@ bool kb::SuperTask::newSubTask(kb::Task tsk) {
     return true;
 }
 
-void kb::SuperTask::deleteSubTask(kb::SubTasks::const_iterator title) {
-    sub_tsk.erase(title);
-}
+
 bool kb::SuperTask::deleteSubTask(size_t index) {
     auto it = sub_tsk.cbegin();
     size_t i = 0;
@@ -53,6 +61,7 @@ bool kb::SuperTask::deleteSubTask(std::string title) {
 }
 
 bool kb::SuperTask::Markable() const {
+    if(marked) {return true;}
     for(auto& t: sub_tsk) {
         if (!t.getMark()) {
             return false;
@@ -70,11 +79,9 @@ bool kb::SuperTask::Mark(bool force) {
 }
 
 bool kb::SuperTask::switchMark(bool force) {
-    if (force) {marked = !marked; return marked;}
-
     if(marked) {
         unMark();
-        return true;
+        return false;
     }
-    else { return Mark(false); }
+    else { return Mark(force); }
 }

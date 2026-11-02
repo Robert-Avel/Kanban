@@ -18,11 +18,11 @@ namespace kb
             void setDescription(std::string description_) {this->description = description_;}
             const std::string& getDescription() const {return this->description;}
 
-            bool Markable() const {return true;}
+            virtual bool Markable() const {return true;}
 
-            bool Mark(bool force) {marked = true; return true;}
+            virtual bool Mark(bool force) {marked = true; return true;}
             void unMark() {marked = false;}
-            bool switchMark(bool force) {marked = !marked; return marked;}
+            virtual bool switchMark(bool force) {marked = !marked; return marked;}
 
             bool getMark() const {return marked;}
     };

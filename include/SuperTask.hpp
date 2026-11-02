@@ -8,6 +8,7 @@ namespace kb {
     class SuperTask: public kb::Task {
         SubTasks sub_tsk;
 
+        bool duplicated(const std::string& title);
         public:
             SuperTask() = delete;
             SuperTask(std::string title_, std::string description_): kb::Task(title_, description_) {}
@@ -15,21 +16,20 @@ namespace kb {
 
             bool deleteSubTask(size_t index);
             bool deleteSubTask(std::string title);
-            void deleteSubTask(SubTasks::const_iterator title);
 
-            const Task* getTask(size_t index) const;
-            const Task* getTask(std::string title) const;
+            Task* getTask(size_t index);
+            Task* getTask(std::string title);
 
-            bool Markable() const;
+            bool Markable() const override;
 
-            bool Mark(bool force);
-            void unMark();
-            bool switchMark(bool force);
+            bool Mark(bool force) override;
+            bool switchMark(bool force) override;
 
-            bool getMark() const;
+            auto cbegin() const {return sub_tsk.cbegin();}
+            auto cend() const {return sub_tsk.cend();}
 
-            auto begin() {return sub_tsk.cbegin();}
-            auto end() {return sub_tsk.cend();}
+            auto begin() {return sub_tsk.begin();}
+            auto end() {return sub_tsk.end();}
 
             size_t size() const {return sub_tsk.size();}
     };
