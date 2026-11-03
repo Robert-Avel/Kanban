@@ -1,3 +1,7 @@
+#ifndef TASK_HPP
+#define TASK_HPP
+
+
 #include <string>
 
 namespace kb
@@ -11,6 +15,7 @@ namespace kb
         public:
             Task() = delete;
             Task(std::string title_, std::string description_): title(title_), description(description_), marked(false) {}
+            Task(std::string title_, std::string description_, bool mark): title(title_), description(description_), marked(mark) {}
 
             void setTitle(std::string title_) {this->title = title_;}
             const std::string& getTitle() const {return this->title;}
@@ -27,3 +32,5 @@ namespace kb
             bool getMark() const {return marked;}
     };
 };
+
+#endif

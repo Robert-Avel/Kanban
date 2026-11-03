@@ -1,9 +1,10 @@
+#ifndef MASTER_FRAME_HPP
+#define MASTER_FRAME_HPP
+
 #include <cstddef>
 #include <string>
 #include <vector>
 #include "Frame.hpp"
-
-
 
 
 namespace kb {
@@ -32,6 +33,7 @@ namespace kb {
 
             Status newFrame(kb::Frame f);
             const kb::Frame* getFrame(size_t index) const;
+            size_t size() const {return frames.size();}
 
             auto cbegin() const {return frames.cbegin();}
             auto cend() const {return frames.cend();}
@@ -53,3 +55,5 @@ namespace kb {
             Status deleteSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index);
     };
 }
+
+#endif

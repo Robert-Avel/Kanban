@@ -1,3 +1,6 @@
+#ifndef FRAME_HPP
+#define FRAME_HPP
+
 #include "SuperTask.hpp"
 #include <cstddef>
 #include <string>
@@ -32,3 +35,5 @@ namespace kb
             size_t size() const {return tasks.size();}
     };
 };
+
+#endif

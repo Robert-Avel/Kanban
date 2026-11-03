@@ -2,7 +2,7 @@ CXX := g++
 CFLAGS := -Iinclude -Wall
 
 SRC := $(shell find src -name "*.cpp")
-DEPENDENCE := -lCerealShell
+DEPENDENCE := -lCerealShell -lByteS
 GTKLIB = $(pkg-config gtkmm-4.0 --cflags --libs)
 
 BUILD_DIR := build
