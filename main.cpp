@@ -1,7 +1,11 @@
 #include "MasterFrame.hpp"
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <CerealShell/CerealShell.hpp>
+#include <fstream>
+#include <ios>
+#include "Data.hpp"
 
 std::string translateStatus(kb::Status s) {
     switch (s) {
@@ -28,7 +32,7 @@ std::string translateStatus(kb::Status s) {
     }
 }
 
-static kb::MasterFrame mf;
+kb::MasterFrame mf;
 
 const std::string newFrame(std::string name) {
     return translateStatus(mf.newFrame(name));
@@ -53,27 +57,41 @@ std::string switchMarkSubTask(size_t frame_index, size_t super_tsk_index, size_t
 
 std::string mvSuperTask(size_t origin_frame_index, size_t task_index, size_t dest_frame_index, bool force) {
     return translateStatus(mf.mvSuperTask(origin_frame_index, task_index, dest_frame_index, force));
+}
 
+std::string deleteFrame(size_t frame_index, bool force) {
+    return translateStatus(mf.deleteFrame(frame_index, force));
+}
+
+std::string deleteSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
+    return translateStatus(mf.deleteSuperTask(frame_index, super_tsk_index, force));
+}
+
+std::string deleteSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index) {
+    return translateStatus(mf.deleteSubTask(frame_index, super_tsk_index, sub_tsk_index));
 }
 
 
-void printall() {
-
+void printall(kb::MasterFrame& mf) {
+    size_t i = 0;
     for(auto& frames: mf) {
-        std::cout << "Frame " << frames.getName() << '\n';
+        std::cout << " <" << i << "> Frame " << frames.getName() << '\n';
 
+        size_t ii = 0;
         for(auto& suptsk: frames) {
-            std::cout << "\tSuper Task: " << (suptsk.getMark() ? "O" : "X") << " | " << suptsk.getTitle() << " | " << suptsk.getDescription() << '\n';
+            std::cout << "\t<" << i << '.' << ii << "> " << (suptsk.getMark() ? "O" : "X") << " | " << suptsk.getTitle() << " | " << suptsk.getDescription() << '\n';
 
+            size_t iii = 0;
             for(auto& tsk: suptsk) {
-                std::cout << "\t\tTask: " << (tsk.getMark() ? "O" : "X") << " | " << tsk.getTitle() << " | " << tsk.getDescription() << '\n';
+                std::cout << "\t\t<" << i << '.' << ii << '.' << iii << "> " << (tsk.getMark() ? "O" : "X") << " | " << tsk.getTitle() << " | " << tsk.getDescription() << '\n';
+                iii++;
             }
-            std::cout << '\n';
+            ii++;
         }
-        std::cout << '\n';
+        i++;
     }
-    std::cout << '\n';
 }
+void printall() {printall(mf);}
 
 
 CPP_FUNCTION_NEW(newFrame, STRING, 1, (c0), CPP_ARG_ASSEMBLY_POS( 0, STRING ))
@@ -82,7 +100,28 @@ CPP_FUNCTION_NEW(newSubTask, STRING, 4, (c0, c1, c2, c3), CPP_ARG_ASSEMBLY_POS( 
 CPP_FUNCTION_NEW(switchMarkSuperTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, BOOL))
 CPP_FUNCTION_NEW(switchMarkSubTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, LONG))
 CPP_FUNCTION_NEW(mvSuperTask, STRING, 4, (c0, c1, c2, c3), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, LONG) CPP_ARG_ASSEMBLY_POS(3, BOOL))
+CPP_FUNCTION_NEW(deleteFrame, STRING, 2, (c0, c1), CPP_ARG_ASSEMBLY_POS( 0, LONG )  CPP_ARG_ASSEMBLY_POS(1, BOOL))
+CPP_FUNCTION_NEW(deleteSuperTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS( 1, LONG )  CPP_ARG_ASSEMBLY_POS(2, BOOL))
+CPP_FUNCTION_NEW(deleteSubTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, LONG))
 CPP_VOID_FUNCTION_NEW(printall, 0, ())
+
+
+void lload() {
+    std::string FILE_NAME = "data.bin";
+    std::ifstream data(FILE_NAME, std::ios::in | std::ios::app | std::ios::binary);
+    auto buffer = kb::Data1::load(data, FILE_NAME);
+    if(buffer.has_value()) {mf = buffer.value();}
+    else mf = {};
+    data.close();
+}
+
+void save() {
+    std::ofstream data;
+    data.open("data.bin", std::ios::out | std::ios::binary | std::ios::trunc);
+    kb::Data1::save(data, mf);
+    data.close();
+}
+
 
 int main() {
     cs::CerealShell cs;
@@ -94,6 +133,11 @@ int main() {
     cs.newFunction("sst", switchMarkSuperTask__outCShell);
     cs.newFunction("st", switchMarkSubTask__outCShell);
     cs.newFunction("mct", mvSuperTask__outCShell);
+    cs.newFunction("df", deleteFrame__outCShell);
+    cs.newFunction("dst", deleteSuperTask__outCShell);
+    cs.newFunction("dt", deleteSubTask__outCShell);
 
+    lload();
     cs.initLoop();
+    save();
 }

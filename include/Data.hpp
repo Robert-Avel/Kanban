@@ -4,21 +4,23 @@
 
 #include <ByteS.hpp>
 #include <MasterFrame.hpp>
+#include <fstream>
 #include <optional>
 
 namespace kb {
-    class Data: public ByteS {
-        public:
-        Data() = default;
-            void appendTask(kb::Task& tsk);
-            void appendSuperTask(kb::SuperTask& stsk);
-            void appendFrame(kb::Frame& frm);
-            void appendMasterFrame(kb::MasterFrame& mfrm);
+    namespace Data1 {
+        ByteS appendTask(kb::Task& tsk);
+        ByteS appendSuperTask(kb::SuperTask& stsk);
+        ByteS appendFrame(kb::Frame& frm);
+        ByteS appendMasterFrame(kb::MasterFrame& mfrm);
 
-            std::optional<kb::Task> popTask();
-            std::optional<kb::SuperTask> popSuperTask();
-            std::optional<kb::Frame> popFrame();
-            std::optional<kb::MasterFrame> popMasterFrame();
+        std::optional<kb::Task> popTask(ByteS& d);
+        std::optional<kb::SuperTask> popSuperTask(ByteS& d);
+        std::optional<kb::Frame> popFrame(ByteS& d);
+        std::optional<kb::MasterFrame> popMasterFrame(ByteS& d);
+
+        bool save(std::ofstream& f,kb::MasterFrame& mfrm);
+        std::optional<kb::MasterFrame> load(std::ifstream& f, std::string& filepath);
     };
 };
 

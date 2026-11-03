@@ -6,17 +6,17 @@ DEPENDENCE := -lCerealShell -lByteS
 GTKLIB = $(pkg-config gtkmm-4.0 --cflags --libs)
 
 BUILD_DIR := build
-TEST_OUT := teste
+TEST_OUT := test
 MAIN_OUT := main
 
 TEST_TARGET := test.cpp
 MAIN_TARGET := main.cpp
 
 main:$(BUILD_DIR) $(MAIN_TARGET)
-	$(CXX) $(MAIN_TARGET) $(SRC) $(CFLAGS) $(DEPENDENCE) -o $(BUILD_DIR)/$(MAIN_OUT)
+	$(CXX) $(MAIN_TARGET) $(SRC) $(CFLAGS) $(DEPENDENCE) -o $(BUILD_DIR)/$(MAIN_OUT) -g
 
 test: $(BUILD_DIR) $(TEST_TARGET)
-	$(CXX) $(TEST_TARGET) $(SRC) $(CFLAGS) $(DEPENDENCE) -o $(BUILD_DIR)/$(TEST_OUT)
+	$(CXX) $(TEST_TARGET) $(SRC) $(CFLAGS) $(DEPENDENCE) -o $(BUILD_DIR)/$(TEST_OUT) -g
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
