@@ -1,12 +1,16 @@
 #ifndef SUPER_TASK_HPP
 #define SUPER_TASK_HPP
 
-
 #include "Task.hpp"
 #include <cstddef>
 #include <vector>
 
+
+
 namespace kb {
+
+    using index = size_t;
+
     using SubTasks = std::vector<kb::Task>;
 
     class SuperTask: public kb::Task {
@@ -17,13 +21,14 @@ namespace kb {
             SuperTask() = delete;
             SuperTask(std::string title_, std::string description_): kb::Task(title_, description_) {}
             SuperTask(std::string title_, std::string description_, bool mark): kb::Task(title_, description_, mark) {}
-            bool newSubTask(kb::Task tsk);
 
-            bool deleteSubTask(size_t index);
+            std::pair<index, Task*> newSubTask(kb::Task tsk);
+
+            bool deleteSubTask(index index);
             bool deleteSubTask(std::string title);
 
-            Task* getTask(size_t index);
-            Task* getTask(std::string title);
+            std::pair<index, Task*> getTask(std::string title);
+            Task* getTask(index index);
 
             bool Markable() const override;
 

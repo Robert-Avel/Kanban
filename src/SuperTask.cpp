@@ -1,4 +1,5 @@
 #include "SuperTask.hpp"
+#include <cstdint>
 
 bool kb::SuperTask::duplicated(const std::string& title) {
     for(auto& t: sub_tsk) {
@@ -16,22 +17,24 @@ kb::Task* kb::SuperTask::getTask(size_t index) {
 }
 
 
-kb::Task* kb::SuperTask::getTask(std::string title) {
+std::pair<size_t, kb::Task*> kb::SuperTask::getTask(std::string title) {
+    size_t i = 0;
     for(auto& t: sub_tsk) {
         if (t.getTitle() == title) {
-            return &t;
+            return { i , &t };
         }
+        i++;
     }
-    return nullptr;
+    return {SIZE_MAX, nullptr};
 }
 
 
-bool kb::SuperTask::newSubTask(kb::Task tsk) {
+std::pair<size_t, kb::Task*> kb::SuperTask::newSubTask(kb::Task tsk) {
     auto t = this->getTask(tsk.getTitle());
-    if(t != nullptr) {return false;}
+    if(t.second != nullptr) {return {SIZE_MAX, nullptr};}
 
     sub_tsk.push_back(tsk);
-    return true;
+    return getTask(tsk.getTitle());
 }
 
 

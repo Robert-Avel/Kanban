@@ -34,18 +34,6 @@ std::string translateStatus(kb::Status s) {
 
 kb::MasterFrame mf;
 
-const std::string newFrame(std::string name) {
-    return translateStatus(mf.newFrame(name));
-}
-
-std::string newSuperTask(size_t frame_index, std::string title, std::string description) {
-    return translateStatus(mf.newSuperTask(frame_index, title, description));
-}
-
-std::string newSubTask(size_t frame_index, size_t super_tsk_index, std::string title, std::string description) {
-    return translateStatus(mf.newSubTask(frame_index, super_tsk_index, title, description));
-}
-
 
 std::string switchMarkSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
     return translateStatus(mf.switchMarkSuperTask(frame_index, super_tsk_index, force));
@@ -94,9 +82,6 @@ void printall(kb::MasterFrame& mf) {
 void printall() {printall(mf);}
 
 
-CPP_FUNCTION_NEW(newFrame, STRING, 1, (c0), CPP_ARG_ASSEMBLY_POS( 0, STRING ))
-CPP_FUNCTION_NEW(newSuperTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, STRING) CPP_ARG_ASSEMBLY_POS(2, STRING))
-CPP_FUNCTION_NEW(newSubTask, STRING, 4, (c0, c1, c2, c3), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, STRING) CPP_ARG_ASSEMBLY_POS(3, STRING))
 CPP_FUNCTION_NEW(switchMarkSuperTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, BOOL))
 CPP_FUNCTION_NEW(switchMarkSubTask, STRING, 3, (c0, c1, c2), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, LONG))
 CPP_FUNCTION_NEW(mvSuperTask, STRING, 4, (c0, c1, c2, c3), CPP_ARG_ASSEMBLY_POS( 0, LONG ) CPP_ARG_ASSEMBLY_POS(1, LONG) CPP_ARG_ASSEMBLY_POS(2, LONG) CPP_ARG_ASSEMBLY_POS(3, BOOL))
@@ -126,9 +111,6 @@ void save() {
 int main() {
     cs::CerealShell cs;
 
-    cs.newFunction("nf", newFrame__outCShell);
-    cs.newFunction("nst", newSuperTask__outCShell);
-    cs.newFunction("nt", newSubTask__outCShell);
     cs.newFunction("pa", printall__outCShell);
     cs.newFunction("sst", switchMarkSuperTask__outCShell);
     cs.newFunction("st", switchMarkSubTask__outCShell);

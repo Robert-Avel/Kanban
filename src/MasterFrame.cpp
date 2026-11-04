@@ -1,5 +1,6 @@
 #include "MasterFrame.hpp"
 #include <cstddef>
+#include <cstdint>
 
 
 bool kb::MasterFrame::Markable(Frame& f) {
@@ -18,75 +19,66 @@ bool kb::MasterFrame::duplicated(const std::string& name) {
 }
 
 
-kb::Status kb::MasterFrame::_moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame) {
-    if(!dest_frame.newSuperTask(task)) {return DUPLICATED;}
-    if(!origin_fram.deleteSuperTask(task.getTitle(), true)) {return FAIL;}
+std::pair<kb::index, kb::Status> kb::MasterFrame::moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame) {
+    auto _task = dest_frame.newSuperTask(task);
+    if(_task.second != nullptr) {return {SIZE_MAX, DUPLICATED};}
 
-    auto* _task = dest_frame.getSuperTask(task.getTitle());
-    _task->unMark();
-    for(auto& t: *_task) {
+    if(!origin_fram.deleteSuperTask(task.getTitle(), true)) {return {SIZE_MAX, FAIL};}
+
+    _task.second->unMark();
+    for(auto& t: *_task.second) {
         t.unMark();
     }
-    return SUCCESS;
+    return {_task.first, SUCCESS};
 }
 
 
-kb::Status kb::MasterFrame::newFrame(kb::Frame f) {
-    if(duplicated(f.getName())) {return DUPLICATED;}
 
-    frames.push_back(f);
-    return SUCCESS;
-}
-
-
-const kb::Frame* kb::MasterFrame::getFrame(size_t index) const {
+kb::Frame* kb::MasterFrame::getFrame(size_t index) {
     if(index >= frames.size()) {return nullptr;}
     return &frames.at(index);}
 
 
-kb::Frame* kb::MasterFrame::_getFrame(size_t index) {
-    return const_cast<kb::Frame*>(getFrame(index));
+
+std::pair<size_t, kb::Frame*> kb::MasterFrame::getFrame(const std::string& name) {
+    size_t i = 0;
+    for(auto& f: frames) {
+        if(f.getName() == name) {return {i, &f};}
+        i++;
+    }
+    return {SIZE_MAX, nullptr};
 }
 
 
-kb::Status kb::MasterFrame::mvSuperTask(size_t origin_frame_index, size_t task_index, size_t dest_frame_index, bool force) {
-    auto ori_fr = _getFrame(origin_frame_index);
-    auto dest_fr = _getFrame(dest_frame_index);
-    if(ori_fr == nullptr || dest_fr == nullptr) {return FRAME_NOT_FOUND;}
+std::pair<size_t, kb::Frame*> kb::MasterFrame::newFrame(kb::Frame f) {
+    if(duplicated(f.getName())) {return {SIZE_MAX, nullptr};}
+
+    frames.push_back(f);
+    return getFrame(f.getName());
+}
+
+
+std::pair<kb::index, kb::Status> kb::MasterFrame::mvSuperTask(size_t origin_frame_index, size_t task_index, size_t dest_frame_index, bool force) {
+    auto ori_fr = getFrame(origin_frame_index);
+    auto dest_fr = getFrame(dest_frame_index);
+    if(ori_fr == nullptr) {return {origin_frame_index, FRAME_NOT_FOUND};}
+    if(dest_fr == nullptr) {return {dest_frame_index, FRAME_NOT_FOUND};}
 
     auto task = ori_fr->getSuperTask(task_index);
-    if(task == nullptr) {return TASK_NOT_FOUND;}
-    if(!task->Markable() && force) {return INCOMPLETE_MARK;}
+    if(task == nullptr) {return {task_index, TASK_NOT_FOUND};}
+    if(!task->Markable() && force) {return {SIZE_MAX, INCOMPLETE_MARK};}
 
-    return _moveTask(*ori_fr, *task, *dest_fr);
+    return moveTask(*ori_fr, *task, *dest_fr);
 }
 
-kb::Status kb::MasterFrame::newFrame(std::string name) {
-    if(duplicated(name)) {return DUPLICATED;}
+std::pair<size_t, kb::Frame*> kb::MasterFrame::newFrame(std::string name) {
+    if(duplicated(name)) {return {SIZE_MAX, nullptr};}
     frames.push_back({name});
-    return SUCCESS;
-}
-
-kb::Status kb::MasterFrame::newSuperTask(size_t frame_index, std::string title, std::string description) {
-    auto fr = _getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    if(fr->newSuperTask(title, description)) {return SUCCESS;}
-    else {return DUPLICATED;}
-}
-
-kb::Status kb::MasterFrame::newSubTask(size_t frame_index, size_t super_tsk_index, std::string title, std::string description) {
-    auto fr = _getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    auto st = fr->getSuperTask(super_tsk_index);
-    if(st == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    return st->newSubTask({title, description}) ? SUCCESS : DUPLICATED;
+    return getFrame(name);
 }
 
 kb::Status kb::MasterFrame::switchMarkSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
-    auto fr = _getFrame(frame_index);
+    auto fr = getFrame(frame_index);
     if(fr == nullptr) {return FRAME_NOT_FOUND;}
 
     auto st = fr->getSuperTask(super_tsk_index);
@@ -97,7 +89,7 @@ kb::Status kb::MasterFrame::switchMarkSuperTask(size_t frame_index, size_t super
 }
 
 kb::Status kb::MasterFrame::switchMarkSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index) {
-    auto fr = _getFrame(frame_index);
+    auto fr = getFrame(frame_index);
     if(fr == nullptr) {return FRAME_NOT_FOUND;}
 
     auto st = fr->getSuperTask(super_tsk_index);
@@ -123,7 +115,7 @@ kb::Status kb::MasterFrame::deleteFrame(size_t frame_index, bool force) {
 }
 
 kb::Status kb::MasterFrame::deleteSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
-    auto fr = _getFrame(frame_index);
+    auto fr = getFrame(frame_index);
     if(fr == nullptr) {return FRAME_NOT_FOUND;}
 
     auto st = fr->getSuperTask(super_tsk_index);
@@ -134,7 +126,7 @@ kb::Status kb::MasterFrame::deleteSuperTask(size_t frame_index, size_t super_tsk
 
 
 kb::Status kb::MasterFrame::deleteSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index) {
-    auto fr = _getFrame(frame_index);
+    auto fr = getFrame(frame_index);
     if(fr == nullptr) {return FRAME_NOT_FOUND;}
 
     auto st = fr->getSuperTask(super_tsk_index);

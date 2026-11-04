@@ -1,4 +1,6 @@
 #include "Frame.hpp"
+#include <cstddef>
+#include <cstdint>
 
 bool kb::Frame::duplicated(const std::string& title) {
     for(auto& t: tasks) {
@@ -9,18 +11,18 @@ bool kb::Frame::duplicated(const std::string& title) {
     return false;
 }
 
-bool kb::Frame::newSuperTask(std::string title_, std::string description_) {
-    if(duplicated(title_)) {return false;}
+std::pair<size_t, kb::SuperTask*> kb::Frame::newSuperTask(std::string title_, std::string description_) {
+    if(duplicated(title_)) {return {SIZE_MAX, nullptr};}
 
     tasks.push_back({title_, description_});
-    return true;
+    return getSuperTask(title_);
 }
 
-bool kb::Frame::newSuperTask(kb::SuperTask& st) {
-    if(duplicated(st.getTitle())) {return false;}
+std::pair<size_t, kb::SuperTask*> kb::Frame::newSuperTask(kb::SuperTask& st) {
+    if(duplicated(st.getTitle())) {return {SIZE_MAX, nullptr};}
 
     tasks.push_back(st);
-    return true;
+    return getSuperTask(st.getTitle());
 }
 
 kb::SuperTask* kb::Frame::getSuperTask(size_t index) {
@@ -28,11 +30,13 @@ kb::SuperTask* kb::Frame::getSuperTask(size_t index) {
     return &tasks.at(index);
 }
 
-kb::SuperTask* kb::Frame::getSuperTask(std::string title) {
+std::pair<size_t, kb::SuperTask*> kb::Frame::getSuperTask(std::string title) {
+    size_t i = 0;
     for(auto& st: this->tasks) {
-        if(st.getTitle() == title) {return &st;}
+        if(st.getTitle() == title) {return {i, &st};}
+        i++;
     }
-    return nullptr;
+    return {SIZE_MAX, nullptr};
 }
 
 
@@ -61,4 +65,11 @@ bool kb::Frame::deleteSuperTask(std::string title_, bool force) {
         it++;
     }
     return false;
+}
+
+bool kb::Frame::Markable() {
+    for(auto& st: tasks) {
+        if(!st.Markable()) {return false;}
+    }
+    return true;
 }

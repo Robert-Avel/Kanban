@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "Frame.hpp"
+#include "SuperTask.hpp"
 
 
 namespace kb {
@@ -18,6 +19,7 @@ namespace kb {
         FRAME_NOT_FOUND,
         DUPLICATED,
         INCOMPLETE_MARK,
+        NO_INPUT
     };
 
     class MasterFrame {
@@ -25,14 +27,13 @@ namespace kb {
 
         static bool Markable(Frame& f);
         bool duplicated(const std::string& name);
-        kb::Frame* _getFrame(size_t index);
-        Status _moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame);
 
         public:
             MasterFrame() = default;
 
-            Status newFrame(kb::Frame f);
-            const kb::Frame* getFrame(size_t index) const;
+            kb::Frame* getFrame(index index);
+            std::pair<index, Frame*> getFrame(const std::string& name);
+
             size_t size() const {return frames.size();}
 
             auto cbegin() const {return frames.cbegin();}
@@ -41,18 +42,18 @@ namespace kb {
             auto begin() {return frames.begin();}
             auto end() {return frames.end();}
 
-            Status mvSuperTask(size_t origin_frame_index, size_t task_index, size_t dest_frame_index, bool force);
+            std::pair<kb::index, kb::Status> mvSuperTask(index origin_frame_index, index task_index, index dest_frame_index, bool force);
+            std::pair<kb::index, kb::Status> moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame);
 
-            Status newFrame(std::string name);
-            Status newSuperTask(size_t frame_index, std::string title, std::string description);
-            Status newSubTask(size_t frame_index, size_t super_tsk_index, std::string title, std::string description);
+            std::pair<index, Frame*> newFrame(kb::Frame f);
+            std::pair<index, Frame*> newFrame(std::string name);
 
-            Status switchMarkSuperTask(size_t frame_index, size_t super_tsk_index, bool force);
-            Status switchMarkSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index);
+            Status switchMarkSuperTask(index frame_index, index super_tsk_index, bool force);
+            Status switchMarkSubTask(index frame_index, index super_tsk_index, index sub_tsk_index);
 
-            Status deleteFrame(size_t frame_index, bool force);
-            Status deleteSuperTask(size_t frame_index, size_t super_tsk_index, bool force);
-            Status deleteSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index);
+            Status deleteFrame(index frame_index, bool force);
+            Status deleteSuperTask(index frame_index, index super_tsk_index, bool force);
+            Status deleteSubTask(index frame_index, index super_tsk_index, index sub_tsk_index);
     };
 }
 
