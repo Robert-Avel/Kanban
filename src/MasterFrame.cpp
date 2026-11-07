@@ -21,7 +21,7 @@ bool kb::MasterFrame::duplicated(const std::string& name) {
 
 std::pair<kb::index, kb::Status> kb::MasterFrame::moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame) {
     auto _task = dest_frame.newSuperTask(task);
-    if(_task.second != nullptr) {return {SIZE_MAX, DUPLICATED};}
+    if(_task.second == nullptr) {return {SIZE_MAX, DUPLICATED};}
 
     if(!origin_fram.deleteSuperTask(task.getTitle(), true)) {return {SIZE_MAX, FAIL};}
 
@@ -66,7 +66,7 @@ std::pair<kb::index, kb::Status> kb::MasterFrame::mvSuperTask(size_t origin_fram
 
     auto task = ori_fr->getSuperTask(task_index);
     if(task == nullptr) {return {task_index, TASK_NOT_FOUND};}
-    if(!task->Markable() && force) {return {SIZE_MAX, INCOMPLETE_MARK};}
+    if(!task->Markable() && !force) {return {SIZE_MAX, INCOMPLETE_MARK};}
 
     return moveTask(*ori_fr, *task, *dest_fr);
 }

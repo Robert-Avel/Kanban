@@ -100,7 +100,7 @@ kb::BasePayLoad kb::Kanban::deleteSuperTask(index frame, index super_task, bool 
     if(st == nullptr) {return {SUPER_TASK_NOT_FOUND, super_task};}
 
     auto tmp = st->getTitle();
-    if(st->Markable() && !force) {return {INCOMPLETE_MARK, *st};}
+    if(!st->Markable() && !force) {return {INCOMPLETE_MARK, *st};}
     else if(!f->deleteSuperTask(super_task, force)) {return {FAIL, *st};}
     else return {SUCCESS, tmp};
 }
@@ -111,8 +111,8 @@ kb::BasePayLoad kb::Kanban::deleteFrame(index frame, bool force) {
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
     auto tmp = f->getName();
-    if(f->Markable() && !force) {return {INCOMPLETE_MARK, *f};}
-    else if(!kanban.deleteFrame(frame, force)) {return {FAIL, *f};}
+    if(!f->Markable() && !force) {return {INCOMPLETE_MARK, *f};}
+    else if(kanban.deleteFrame(frame, force) != SUCCESS) {return {FAIL, *f};}
     else return {SUCCESS, tmp};
 }
 
@@ -127,7 +127,7 @@ kb::BasePayLoad kb::Kanban::markTask(index frame, index super_task, index task) 
     auto* t = st->getTask(task);
     if(t == nullptr) {return {TASK_NOT_FOUND, task};}
 
-    st->Mark(true);
+    t->Mark(true);
     return {SUCCESS, *t};
 }
 
@@ -138,7 +138,7 @@ kb::BasePayLoad kb::Kanban::markSuperTask(index frame, index super_task, bool fo
     auto* st = f->getSuperTask(super_task);
     if(st == nullptr) {return {SUPER_TASK_NOT_FOUND, super_task};}
 
-    if(st->Mark(force)) {return {INCOMPLETE_MARK, *st};}
+    if(!st->Mark(force)) {return {INCOMPLETE_MARK, *st};}
     else return {SUCCESS, *st};
 }
 
@@ -171,7 +171,7 @@ kb::BasePayLoad kb::Kanban::unmarkSuperTask(index frame, index super_task) {
 
 kb::BasePayLoad kb::Kanban::moveSuperTask(index origin_frame, index super_task, index dest_frame, bool force) {
     auto res = kanban.mvSuperTask(origin_frame, super_task, dest_frame, force);
-    auto st_target = kanban.getFrame(origin_frame)->getSuperTask(super_task);
+
     switch (res.second) {
         case SUCCESS:
             return {SUCCESS, res.first};
@@ -180,10 +180,10 @@ kb::BasePayLoad kb::Kanban::moveSuperTask(index origin_frame, index super_task, 
         case FRAME_NOT_FOUND:
             return {FRAME_NOT_FOUND, res.first};
         case INCOMPLETE_MARK:
-            return {INCOMPLETE_MARK, *st_target};
+            return {INCOMPLETE_MARK, origin_frame};
         case DUPLICATED:
-            return {DUPLICATED, *st_target};
+            return {DUPLICATED, origin_frame};
         default:
-            return {FAIL, *st_target};
+            return {FAIL, origin_frame};
     }
 }
