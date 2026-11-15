@@ -26,8 +26,8 @@ namespace kb
             std::pair<index, kb::SuperTask*>  getSuperTask(std::string title);
             kb::SuperTask* getSuperTask(index index);
 
-            auto cbegin() const {return tasks.cbegin();}
-            auto cend() const {return tasks.cend();}
+            auto begin() const {return tasks.cbegin();}
+            auto end() const {return tasks.cend();}
 
             auto begin() {return tasks.begin();}
             auto end() {return tasks.end();}

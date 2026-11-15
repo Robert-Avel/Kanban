@@ -36,8 +36,8 @@ namespace kb {
 
             size_t size() const {return frames.size();}
 
-            auto cbegin() const {return frames.cbegin();}
-            auto cend() const {return frames.cend();}
+            auto begin() const {return frames.cbegin();}
+            auto end() const {return frames.cend();}
 
             auto begin() {return frames.begin();}
             auto end() {return frames.end();}

@@ -10,7 +10,7 @@ TEST_OUT := test
 MAIN_OUT := main
 
 TEST_TARGET := test.cpp
-MAIN_TARGET := main.cpp
+MAIN_TARGET := main-cli.cpp
 
 main:$(BUILD_DIR) $(MAIN_TARGET)
 	$(CXX) $(MAIN_TARGET) $(SRC) $(CFLAGS) $(DEPENDENCE) $(GTKLIB) -o $(BUILD_DIR)/$(MAIN_OUT) -g

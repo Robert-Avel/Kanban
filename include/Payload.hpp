@@ -27,15 +27,16 @@ namespace kb {
             BasePayLoad(Status status_, const OpData& payload_, const std::string message_):
             status(status_), payload(payload_), message(message_) {}
 
-            const MasterFrame* getMasterFrame() {return std::get_if<MasterFrame>(&payload);}
-            const Frame* getFrame() {return std::get_if<Frame>(&payload);}
-            const SuperTask* getSuperTask() {return std::get_if<SuperTask>(&payload);}
-            const Task* getTask() {return std::get_if<Task>(&payload);}
-            const std::string* getString() {return std::get_if<std::string>(&payload);}
-            const index* getIndex() {return std::get_if<index>(&payload);}
+            const MasterFrame* getMasterFrame() const {return std::get_if<MasterFrame>(&payload);}
+            const Frame* getFrame() const {return std::get_if<Frame>(&payload);}
+            const SuperTask* getSuperTask() const {return std::get_if<SuperTask>(&payload);}
+            const Task* getTask() const {return std::get_if<Task>(&payload);}
+            const std::string* getString() const {return std::get_if<std::string>(&payload);}
+            const index* getIndex() const {return std::get_if<index>(&payload);}
 
-            const std::string* getMessage() {return (message.empty() ? nullptr: &message);}
-            const Status& getStatus() {return status;}
+            const std::string* getMessage() const {return (message.empty() ? nullptr: &message);}
+            const Status& getStatus() const {return status;}
+            const OpData& getVariant() const {return payload;}
     };
 }
 

@@ -117,6 +117,39 @@ kb::BasePayLoad kb::Kanban::deleteFrame(index frame, bool force) {
 }
 
 
+kb::BasePayLoad kb::Kanban::getTask(index frame, index super_task, index task) {
+ auto* f = kanban.getFrame(frame);
+    if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
+
+    auto* st = f->getSuperTask(super_task);
+    if(st == nullptr) {return {SUPER_TASK_NOT_FOUND, super_task};}
+
+    auto* t = st->getTask(task);
+    if(t == nullptr) {return {TASK_NOT_FOUND, task};}
+
+    return {SUCCESS, *t};
+}
+
+
+kb::BasePayLoad kb::Kanban::getSuperTask(index frame, index super_task) {
+	auto* f = kanban.getFrame(frame);
+    if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
+
+    auto* st = f->getSuperTask(super_task);
+    if(st == nullptr) {return {SUPER_TASK_NOT_FOUND, super_task};}
+
+    return {SUCCESS, *st};
+}
+
+
+kb::BasePayLoad kb::Kanban::getFrame(index frame) {
+	auto* f = kanban.getFrame(frame);
+    	if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
+
+     	return {SUCCESS, *f};
+}
+
+
 kb::BasePayLoad kb::Kanban::markTask(index frame, index super_task, index task) {
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}

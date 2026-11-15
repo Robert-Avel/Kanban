@@ -1,6 +1,7 @@
 #include "SuperTask.hpp"
 #include "gui/GTask.hpp"
 #include "gtkmm/checkbutton.h"
+#include "gtkmm/enums.h"
 #include "gtkmm/label.h"
 #include "gtkmm/signallistitemfactory.h"
 #include "gtkmm/singleselection.h"
@@ -72,6 +73,7 @@ TaskWindow::TaskWindow():
  	m_scroll_win.set_child(m_column);
 	m_scroll_win.set_policy(Gtk::PolicyType::AUTOMATIC, Gtk::PolicyType::AUTOMATIC);
 	m_scroll_win.set_expand();
+	m_scroll_win.set_halign(Gtk::Align::FILL);
 
 	m_list = Gio::ListStore<TaskModel>::create();
 

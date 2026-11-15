@@ -6,7 +6,6 @@
 #include "gtkmm/columnview.h"
 #include "gtkmm/listitem.h"
 #include "gtkmm/scrolledwindow.h"
-#include "gtkmm/window.h"
 
 
 class TaskModel: public Glib::Object {

@@ -35,8 +35,8 @@ namespace kb {
             bool Mark(bool force) override;
             bool switchMark(bool force) override;
 
-            auto cbegin() const {return sub_tsk.cbegin();}
-            auto cend() const {return sub_tsk.cend();}
+            auto begin() const {return sub_tsk.cbegin();}
+            auto end() const {return sub_tsk.cend();}
 
             auto begin() {return sub_tsk.begin();}
             auto end() {return sub_tsk.end();}
