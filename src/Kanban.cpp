@@ -6,7 +6,7 @@
 #include <ctime>
 #include <string>
 
-#define DATA_FILE_EXT ".bin"
+#define DATA_FILE_EXT ".kb"
 
 
 kb::BasePayLoad kb::Kanban::Open(std::string name) {
@@ -23,24 +23,42 @@ kb::BasePayLoad kb::Kanban::Open(std::string name) {
 
     if(buffer.has_value()) {
         kanban = buffer.value();
+        this->kb_name = name;
         return {SUCCESS, this->kanban};
     }
     else {return {FAIL, final_path, "FAIL_READ"};}
 }
 
 
-kb::BasePayLoad kb::Kanban::Save(std::string name) {
-    std::ofstream file;
-    if(name.empty() && this->kb_name.empty())
-        {return {NO_INPUT, this->app_data_path + "???" + DATA_FILE_EXT, "NO_NAME"};}
+kb::BasePayLoad kb::Kanban::Save() {
+	std::string& name = this->kb_name;
 
-    auto final_path = this->app_data_path + (name.empty() ? kb_name : name) + DATA_FILE_EXT;
-    file.open(final_path , std::ios::out | std::ios::binary | std::ios::trunc);
+    	std::ofstream file;
+     	if(name.empty() && this->kb_name.empty())
+        	{return {NO_INPUT, this->app_data_path + "???" + DATA_FILE_EXT, "NO_NAME"};}
 
-    kb::Data1::save(file, this->kanban);
-    file.close();
-    return {SUCCESS, this->kanban};
+      auto final_path = this->app_data_path + (name.empty() ? kb_name : name) + DATA_FILE_EXT;
+      file.open(final_path , std::ios::out | std::ios::binary | std::ios::trunc);
+
+      kb::Data1::save(file, this->kanban);
+      file.close();
+      return {SUCCESS, this->kanban};
 }
+
+
+kb::BasePayLoad kb::Kanban::setKbName(const std::string name) {
+	if(name.empty()) {return {kb::Status::NO_INPUT, "<EMPTY>"};}
+	this->kb_name = name;
+
+	return {kb::Status::SUCCESS, name};
+}
+
+
+kb::BasePayLoad kb::Kanban::getKbName() const {
+	if(kb_name.empty()) {return {kb::Status::EMPTY, "<NAMELESS>"};}
+	return {kb::Status::SUCCESS, kb_name};
+}
+
 
 
 kb::BasePayLoad kb::Kanban::newTask(index frame, index super_task, const std::string& title, const std::string& description) {
@@ -147,6 +165,10 @@ kb::BasePayLoad kb::Kanban::getFrame(index frame) {
     	if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
      	return {SUCCESS, *f};
+}
+
+kb::BasePayLoad kb::Kanban::getKanban() {
+	return {SUCCESS, kanban, this->kb_name};
 }
 
 

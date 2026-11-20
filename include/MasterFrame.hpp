@@ -19,7 +19,8 @@ namespace kb {
         FRAME_NOT_FOUND,
         DUPLICATED,
         INCOMPLETE_MARK,
-        NO_INPUT
+        NO_INPUT,
+        EMPTY
     };
 
     class MasterFrame {

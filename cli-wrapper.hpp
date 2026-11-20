@@ -56,17 +56,7 @@ static std::string formatMasterFrame(const kb::MasterFrame& mf)
 {
 	std::stringstream buffer;
 	for(const kb::Frame& f: mf) {
-		buffer << '\t' << formatFrame(f);
-	}
-	return buffer.str();
-}
-
-static std::string formatKanBan(const kb::Kanban& kkb)
-{
-	std::stringstream buffer;
-	buffer << kkb.getKbName() << '\n';
-	for(const kb::Frame& f: kkb) {
-		buffer << '\t' << formatFrame(f);
+		buffer << '\n' << '\t' << formatFrame(f);
 	}
 	return buffer.str();
 }
@@ -175,6 +165,11 @@ std::string KBCLgetFrame(kb::Kanban& kanban, kb::index frame)
 	return formatPayLoad(kanban.getFrame(frame));
 }
 
+std::string KBCLgetKanban(kb::Kanban& kanban)
+{
+	return formatPayLoad(kanban.getKanban());
+}
+
 
 std::string KBCLmarkTask(
 	kb::Kanban& kanban,
@@ -228,4 +223,26 @@ std::string KBCLmoveSuperTask(
 )
 {
 	return formatPayLoad(kanban.moveSuperTask(origin_frame, super_task, dest_frame, force));
+}
+
+
+std::string KBCLOpen(kb::Kanban& kanban, std::string name)
+{
+	return formatPayLoad(kanban.Open(name));
+}
+
+std::string KBCLSave(kb::Kanban& kanban)
+{
+	return formatPayLoad(kanban.Save());
+}
+
+std::string KBCLgetKbName(kb::Kanban& kanban)
+{
+	return formatPayLoad(kanban.getKbName());
+}
+
+std::string KBCLsetKbName(kb::Kanban& kanban, const std::string name)
+{
+	return formatPayLoad(kanban.setKbName(name));
+
 }

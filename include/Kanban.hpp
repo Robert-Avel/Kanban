@@ -12,11 +12,12 @@ namespace kb
         public:
             Kanban(std::string appdata_path): app_data_path(appdata_path) {}
 
-            const std::string getKbName() const {return kb_name;}
-            void setKbName(const std::string name) {kb_name = name;}
 
             BasePayLoad Open(std::string name);
-            BasePayLoad Save(std::string name = "");
+            BasePayLoad Save();
+
+            BasePayLoad getKbName() const;
+            BasePayLoad setKbName(const std::string name);
 
             BasePayLoad newTask(index frame, index super_task, const std::string& title, const std::string& description);
             BasePayLoad newSuperTask(index frame, const std::string& title, const std::string& description);
@@ -29,6 +30,7 @@ namespace kb
             BasePayLoad getTask(index frame, index super_task, index task);
             BasePayLoad getSuperTask(index frame, index super_task);
             BasePayLoad getFrame(index frame);
+            BasePayLoad getKanban();
 
             BasePayLoad markTask(index frame, index super_task, index task);
             BasePayLoad markSuperTask(index frame, index super_task, bool force);
