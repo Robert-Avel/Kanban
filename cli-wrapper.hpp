@@ -3,6 +3,7 @@
 #include "MasterFrame.hpp"
 #include "Payload.hpp"
 #include "SuperTask.hpp"
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <variant>
@@ -25,38 +26,53 @@ static std::string STATUS[] = {
 };
 
 
-static std::string formatTask(const kb::Task& t)
+std::string insertTab(uint16_t level) {
+	return std::string(level, '\t');
+}
+
+
+static std::string formatTask(const kb::Task& t, uint16_t tab_level)
 {
-	return t.getMark() ? MARKDED : UNMARKDED + SEPARATOR
+	return insertTab(tab_level).c_str() + (t.getMark() ? MARKDED : UNMARKDED) + SEPARATOR
 	+ t.getTitle() + SEPARATOR + t.getDescription() + '\n';
 }
 
-static std::string formatSuperTask(const kb::SuperTask& st)
+static std::string formatSuperTask(const kb::SuperTask& st, uint16_t tab_level)
 {
 	std::stringstream buffer;
-	buffer << (st.getMark() ? MARKDED : UNMARKDED) << SEPARATOR
+	buffer << insertTab(tab_level) << (st.getMark() ? MARKDED : UNMARKDED) << SEPARATOR
 	<< st.getTitle() << SEPARATOR << st.getDescription() << '\n';
+
+	buffer << insertTab(tab_level) << "< TASKS >\n";
+	if(st.size() == 0) {buffer << insertTab(tab_level + 1) << "[ NO TASKS ]";}
 	for(const kb::Task& t: st) {
-		buffer << '\t' << formatTask(t);
+		buffer << formatTask(t, tab_level + 1);
 	}
 	return buffer.str();
 }
 
-static std::string formatFrame(const kb::Frame& f)
+static std::string formatFrame(const kb::Frame& f, uint16_t tab_level)
 {
 	std::stringstream buffer;
-	buffer << f.getName() << '\n';
+	buffer << insertTab(tab_level) << "Frame : " << f.getName() << "\n";
+
+	buffer << insertTab(tab_level) << "< SUPER TASKS >\n";
+	if(f.size() == 0) {buffer << insertTab(tab_level + 1) << "[ NO SUPER TASKS ]";}
 	for(const kb::SuperTask& st: f) {
-		buffer << '\t' << formatSuperTask(st);
+		buffer << formatSuperTask(st, tab_level + 1);
 	}
+	buffer << '\n';
 	return buffer.str();
 }
 
-static std::string formatMasterFrame(const kb::MasterFrame& mf)
+static std::string formatMasterFrame(const kb::MasterFrame& mf, uint16_t tab_level)
 {
 	std::stringstream buffer;
+
+	buffer << insertTab(tab_level) << "< FRAMES >\n";
+	if(mf.size() == 0) {return insertTab(tab_level + 1) + "[ NO FRAMES ]";}
 	for(const kb::Frame& f: mf) {
-		buffer << '\n' << '\t' << formatFrame(f);
+		buffer << formatFrame(f, tab_level + 1) << '\n';
 	}
 	return buffer.str();
 }
@@ -65,13 +81,13 @@ static std::string formatMasterFrame(const kb::MasterFrame& mf)
 static std::string formatVariant(const kb::OpData& v)
 {
 	if (std::holds_alternative<kb::MasterFrame>(v)) {
-		return formatMasterFrame(std::get<kb::MasterFrame>(v));
+		return formatMasterFrame(std::get<kb::MasterFrame>(v), 0);
 	} else if(std::holds_alternative<kb::Frame>(v)) {
-           	return formatFrame(std::get<kb::Frame>(v));
+           	return formatFrame(std::get<kb::Frame>(v), 0);
       } else if(std::holds_alternative<kb::SuperTask>(v)) {
-          		return formatSuperTask(std::get<kb::SuperTask>(v));
+      	return formatSuperTask(std::get<kb::SuperTask>(v), 0);
       } else if(std::holds_alternative<kb::Task>(v)) {
-		return formatTask(std::get<kb::Task>(v));
+		return formatTask(std::get<kb::Task>(v), 0);
 	} else if(std::holds_alternative<std::string>(v)) {
            	return std::get<std::string>(v);
 	} else if(std::holds_alternative<kb::index>(v)) {
@@ -81,8 +97,8 @@ static std::string formatVariant(const kb::OpData& v)
 
 static std::string formatPayLoad(const kb::BasePayLoad& bp) {
 	const std::string* message = bp.getMessage();
-	return STATUS[bp.getStatus() + 2] + SEPARATOR
-	+ ((message == nullptr) ? "": *message)
+	return STATUS[bp.getStatus() + 2] + "\n"
+	+ ((message == nullptr) ? "": *message) + '\n'
  	+ formatVariant(bp.getVariant());
 }
 
@@ -117,10 +133,11 @@ std::string KBCLdeleteTask(
 	kb::Kanban& kanban,
 	kb::index frame,
 	kb::index super_task,
-	kb::index task
+	kb::index task,
+	bool force
 )
 {
-	return formatPayLoad(kanban.deleteTask(frame, super_task, task));
+	return formatPayLoad(kanban.deleteTask(frame, super_task, task, force));
 }
 
 

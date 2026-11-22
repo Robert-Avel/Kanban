@@ -54,10 +54,12 @@ CPP_FUNCTION_NEW(KBCLnewFrame, STRING, 1, (kaba, cname),
 )
 
 
-CPP_FUNCTION_NEW(KBCLdeleteTask, STRING, 3, (kaba, cframe, cstask, ctask),
+CPP_FUNCTION_NEW(KBCLdeleteTask, STRING, 3, (kaba, cframe, cstask, ctask, cforce),
 	CPP_ARG_ASSEMBLY_NAMED(frame, UNSIGNED_LONG)
 	CPP_ARG_ASSEMBLY_NAMED(stask, UNSIGNED_LONG)
 	CPP_ARG_ASSEMBLY_NAMED(task, UNSIGNED_LONG)
+	CPP_ARG_FLAG(force)
+
 )
 
 CPP_FUNCTION_NEW(KBCLdeleteSuperTask, STRING, 2, (kaba, cframe, cstask, cforce),

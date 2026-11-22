@@ -9,40 +9,50 @@
 
 namespace kb {
 
-    using index = size_t;
+    	using index = size_t;
 
-    using SubTasks = std::vector<kb::Task>;
+    	using SubTasks = std::vector<kb::Task>;
 
-    class SuperTask: public kb::Task {
-        SubTasks sub_tsk;
+     	class SuperTask: public kb::Task {
+	      SubTasks sub_tsk;
 
-        bool duplicated(const std::string& title);
-        public:
-            SuperTask() = delete;
-            SuperTask(std::string title_, std::string description_): kb::Task(title_, description_) {}
-            SuperTask(std::string title_, std::string description_, bool mark): kb::Task(title_, description_, mark) {}
+		inline bool deletable(const kb::Task t, bool force)
+	 		{return t.getMark() || force;}
+	      bool duplicated(const std::string& title);
 
-            std::pair<index, Task*> newSubTask(kb::Task tsk);
+	      public:
+	            SuperTask() = delete;
+	            SuperTask(std::string title_, std::string description_):
+	            kb::Task(title_, description_) {}
+	            SuperTask(std::string title_, std::string description_, bool mark):
+	            kb::Task(title_, description_, mark) {}
 
-            bool deleteSubTask(index index);
-            bool deleteSubTask(std::string title);
+	            std::pair<index, Task*> newSubTask(kb::Task tsk);
 
-            std::pair<index, Task*> getTask(std::string title);
-            Task* getTask(index index);
+	            bool deleteSubTask(index index, bool force);
+	            bool deleteSubTask(std::string title, bool force);
 
-            bool Markable() const override;
+			bool markSubTask(index i);
+			void unmarkSubTask(index i);
 
-            bool Mark(bool force) override;
-            bool switchMark(bool force) override;
+	            std::pair<index, Task*> getTask(std::string title);
+	            Task* getTask(index index);
 
-            auto begin() const {return sub_tsk.cbegin();}
-            auto end() const {return sub_tsk.cend();}
+	            void clear() {sub_tsk.clear();}
 
-            auto begin() {return sub_tsk.begin();}
-            auto end() {return sub_tsk.end();}
+	            bool Markable() const override;
 
-            size_t size() const {return sub_tsk.size();}
-    };
+	            bool Mark(bool force) override;
+	            bool switchMark(bool force) override;
+
+	            auto begin() const {return sub_tsk.cbegin();}
+	            auto end() const {return sub_tsk.cend();}
+
+	            auto begin() {return sub_tsk.begin();}
+	            auto end() {return sub_tsk.end();}
+
+	            size_t size() const {return sub_tsk.size();}
+    	};
 };
 
 #endif

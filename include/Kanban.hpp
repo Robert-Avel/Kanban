@@ -19,13 +19,16 @@ namespace kb
             BasePayLoad getKbName() const;
             BasePayLoad setKbName(const std::string name);
 
+            BasePayLoad clear();
+
             BasePayLoad newTask(index frame, index super_task, const std::string& title, const std::string& description);
             BasePayLoad newSuperTask(index frame, const std::string& title, const std::string& description);
             BasePayLoad newFrame(const std::string& name);
 
-            BasePayLoad deleteTask(index frame, index super_task, index task);
+            BasePayLoad deleteTask(index frame, index super_task, index task, bool force);
             BasePayLoad deleteSuperTask(index frame, index super_task, bool force);
             BasePayLoad deleteFrame(index frame, bool force);
+
 
             BasePayLoad getTask(index frame, index super_task, index task);
             BasePayLoad getSuperTask(index frame, index super_task);

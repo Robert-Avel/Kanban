@@ -60,6 +60,11 @@ kb::BasePayLoad kb::Kanban::getKbName() const {
 }
 
 
+kb::BasePayLoad kb::Kanban::clear() {
+	this->kanban.clear();
+	return {SUCCESS, this->kanban};
+}
+
 
 kb::BasePayLoad kb::Kanban::newTask(index frame, index super_task, const std::string& title, const std::string& description) {
     auto* f = kanban.getFrame(frame);
@@ -94,7 +99,8 @@ kb::BasePayLoad kb::Kanban::newFrame(const std::string& name) {
 }
 
 
-kb::BasePayLoad kb::Kanban::deleteTask(index frame, index super_task, index task) {
+kb::BasePayLoad kb::Kanban::deleteTask(index frame, index super_task, index task, bool force)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -105,12 +111,14 @@ kb::BasePayLoad kb::Kanban::deleteTask(index frame, index super_task, index task
     if(t == nullptr) {return {TASK_NOT_FOUND, task};}
 
     auto tmp = t->getTitle();
-    if(!st->deleteSubTask(task)) {return {FAIL, *t};}
+    if(!t->Markable() && !force) {return {INCOMPLETE_MARK, *t};}
+    if(!st->deleteSubTask(task, force)) {return {FAIL, *t};}
     else return {SUCCESS, tmp};
 }
 
 
-kb::BasePayLoad kb::Kanban::deleteSuperTask(index frame, index super_task, bool force) {
+kb::BasePayLoad kb::Kanban::deleteSuperTask(index frame, index super_task, bool force)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -124,7 +132,8 @@ kb::BasePayLoad kb::Kanban::deleteSuperTask(index frame, index super_task, bool 
 }
 
 
-kb::BasePayLoad kb::Kanban::deleteFrame(index frame, bool force) {
+kb::BasePayLoad kb::Kanban::deleteFrame(index frame, bool force)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -135,7 +144,8 @@ kb::BasePayLoad kb::Kanban::deleteFrame(index frame, bool force) {
 }
 
 
-kb::BasePayLoad kb::Kanban::getTask(index frame, index super_task, index task) {
+kb::BasePayLoad kb::Kanban::getTask(index frame, index super_task, index task)
+{
  auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -149,7 +159,8 @@ kb::BasePayLoad kb::Kanban::getTask(index frame, index super_task, index task) {
 }
 
 
-kb::BasePayLoad kb::Kanban::getSuperTask(index frame, index super_task) {
+kb::BasePayLoad kb::Kanban::getSuperTask(index frame, index super_task)
+{
 	auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -160,19 +171,22 @@ kb::BasePayLoad kb::Kanban::getSuperTask(index frame, index super_task) {
 }
 
 
-kb::BasePayLoad kb::Kanban::getFrame(index frame) {
+kb::BasePayLoad kb::Kanban::getFrame(index frame)
+{
 	auto* f = kanban.getFrame(frame);
     	if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
      	return {SUCCESS, *f};
 }
 
-kb::BasePayLoad kb::Kanban::getKanban() {
+kb::BasePayLoad kb::Kanban::getKanban()
+{
 	return {SUCCESS, kanban, this->kb_name};
 }
 
 
-kb::BasePayLoad kb::Kanban::markTask(index frame, index super_task, index task) {
+kb::BasePayLoad kb::Kanban::markTask(index frame, index super_task, index task)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -186,7 +200,8 @@ kb::BasePayLoad kb::Kanban::markTask(index frame, index super_task, index task) 
     return {SUCCESS, *t};
 }
 
-kb::BasePayLoad kb::Kanban::markSuperTask(index frame, index super_task, bool force) {
+kb::BasePayLoad kb::Kanban::markSuperTask(index frame, index super_task, bool force)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -198,7 +213,8 @@ kb::BasePayLoad kb::Kanban::markSuperTask(index frame, index super_task, bool fo
 }
 
 
-kb::BasePayLoad kb::Kanban::unmarkTask(index frame, index super_task, index task) {
+kb::BasePayLoad kb::Kanban::unmarkTask(index frame, index super_task, index task)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -212,7 +228,8 @@ kb::BasePayLoad kb::Kanban::unmarkTask(index frame, index super_task, index task
     return {SUCCESS, *t};
 }
 
-kb::BasePayLoad kb::Kanban::unmarkSuperTask(index frame, index super_task) {
+kb::BasePayLoad kb::Kanban::unmarkSuperTask(index frame, index super_task)
+{
     auto* f = kanban.getFrame(frame);
     if(f == nullptr) {return {FRAME_NOT_FOUND, frame};}
 
@@ -224,21 +241,26 @@ kb::BasePayLoad kb::Kanban::unmarkSuperTask(index frame, index super_task) {
 }
 
 
-kb::BasePayLoad kb::Kanban::moveSuperTask(index origin_frame, index super_task, index dest_frame, bool force) {
+kb::BasePayLoad kb::Kanban::moveSuperTask(
+	index origin_frame,
+	index super_task,
+	index dest_frame,
+ 	bool force
+) {
     auto res = kanban.mvSuperTask(origin_frame, super_task, dest_frame, force);
 
-    switch (res.second) {
-        case SUCCESS:
-            return {SUCCESS, res.first};
-        case SUPER_TASK_NOT_FOUND:
-            return {SUPER_TASK_NOT_FOUND, res.first};
-        case FRAME_NOT_FOUND:
-            return {FRAME_NOT_FOUND, res.first};
-        case INCOMPLETE_MARK:
-            return {INCOMPLETE_MARK, origin_frame};
-        case DUPLICATED:
-            return {DUPLICATED, origin_frame};
-        default:
-            return {FAIL, origin_frame};
+    	switch (res.second) {
+        	case SUCCESS:
+            	return {SUCCESS, res.first};
+         	case SUPER_TASK_NOT_FOUND:
+            	return {SUPER_TASK_NOT_FOUND, res.first};
+          	case FRAME_NOT_FOUND:
+            	return {FRAME_NOT_FOUND, res.first};
+           	case INCOMPLETE_MARK:
+            	return {INCOMPLETE_MARK, origin_frame};
+            case DUPLICATED:
+            	return {DUPLICATED, origin_frame};
+            default:
+            	return {FAIL, origin_frame};
     }
 }

@@ -45,7 +45,7 @@ bool kb::Frame::deleteSuperTask(size_t index, bool force) {
     auto it = tasks.begin();
     size_t i = 0;
     while(it != tasks.end()) {
-        if(i == index && (force || it->Markable())) {
+        if(i == index && deletable(*it, force)) {
             tasks.erase(it);
             return true;
         }
@@ -58,7 +58,7 @@ bool kb::Frame::deleteSuperTask(size_t index, bool force) {
 bool kb::Frame::deleteSuperTask(std::string title_, bool force) {
     auto it = tasks.begin();
     while(it != tasks.end()) {
-        if(it->getTitle() == title_ && (force || it->Markable())) {
+        if(it->getTitle() == title_ && deletable(*it, force)) {
             tasks.erase(it);
             return true;
         }
@@ -72,4 +72,20 @@ bool kb::Frame::Markable() {
         if(!st.Markable()) {return false;}
     }
     return true;
+}
+
+
+bool kb::Frame::markSuperTask(index i, bool force) {
+	auto* st = this->getSuperTask(i);
+	if(st == nullptr) {return false;}
+
+	return st->Mark(force);
+}
+
+bool kb::Frame::unmarkSuperTask(index i) {
+	auto* st = this->getSuperTask(i);
+	if(st == nullptr) {return false;}
+
+	st->unMark();
+	return true;
 }

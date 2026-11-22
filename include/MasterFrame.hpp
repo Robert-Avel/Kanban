@@ -29,6 +29,7 @@ namespace kb {
         static bool Markable(Frame& f);
         bool duplicated(const std::string& name);
 
+      std::pair<kb::index, kb::Status> moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame);
         public:
             MasterFrame() = default;
 
@@ -44,18 +45,14 @@ namespace kb {
             auto end() {return frames.end();}
 
             std::pair<kb::index, kb::Status> mvSuperTask(index origin_frame_index, index task_index, index dest_frame_index, bool force);
-            std::pair<kb::index, kb::Status> moveTask(kb::Frame& origin_fram, kb::SuperTask& task, kb::Frame& dest_frame);
 
             std::pair<index, Frame*> newFrame(kb::Frame f);
             std::pair<index, Frame*> newFrame(std::string name);
 
-            Status switchMarkSuperTask(index frame_index, index super_tsk_index, bool force);
-            Status switchMarkSubTask(index frame_index, index super_tsk_index, index sub_tsk_index);
 
             Status deleteFrame(index frame_index, bool force);
-            Status deleteSuperTask(index frame_index, index super_tsk_index, bool force);
-            Status deleteSubTask(index frame_index, index super_tsk_index, index sub_tsk_index);
-    };
+            void clear() {frames.clear();}
+    	};
 }
 
 #endif

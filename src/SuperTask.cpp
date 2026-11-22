@@ -2,12 +2,12 @@
 #include <cstdint>
 
 bool kb::SuperTask::duplicated(const std::string& title) {
-    for(auto& t: sub_tsk) {
-        if (t.getTitle() == title) {
-            return true;
-        }
-    }
-    return false;
+    	for(auto& t: sub_tsk) {
+        	if (t.getTitle() == title) {
+            	return true;
+         	}
+     	}
+      return false;
 }
 
 
@@ -18,14 +18,14 @@ kb::Task* kb::SuperTask::getTask(size_t index) {
 
 
 std::pair<size_t, kb::Task*> kb::SuperTask::getTask(std::string title) {
-    size_t i = 0;
-    for(auto& t: sub_tsk) {
-        if (t.getTitle() == title) {
-            return { i , &t };
-        }
-        i++;
-    }
-    return {SIZE_MAX, nullptr};
+    	size_t i = 0;
+     	for(auto& t: sub_tsk) {
+        	if (t.getTitle() == title) {
+            	return { i , &t };
+         	}
+      i++;
+      }
+      return {SIZE_MAX, nullptr};
 }
 
 
@@ -38,53 +38,68 @@ std::pair<size_t, kb::Task*> kb::SuperTask::newSubTask(kb::Task tsk) {
 }
 
 
-bool kb::SuperTask::deleteSubTask(size_t index) {
-    auto it = sub_tsk.cbegin();
-    size_t i = 0;
-    while(it != sub_tsk.cend()) {
-        if(i == index) {
-            sub_tsk.erase(it);
-            return true;
-        }
-        it++; i++;
-    }
-    return false;
+bool kb::SuperTask::deleteSubTask(size_t index, bool force) {
+	auto it = sub_tsk.cbegin();
+	size_t i = 0;
+	while(it != sub_tsk.cend()) {
+	      if(i == index) {
+	       	if(!deletable(*it, force)) {return false;}
+	            sub_tsk.erase(it);
+	            return true;
+        	}
+        	it++; i++;
+    	}
+    	return false;
 }
 
-bool kb::SuperTask::deleteSubTask(std::string title) {
-    auto it = sub_tsk.cbegin();
-    while(it != sub_tsk.cend()) {
-        if(title == it->getTitle()) {
-            sub_tsk.erase(it);
-            return true;
-        }
-        it++;
-    }
-    return false;
+bool kb::SuperTask::deleteSubTask(std::string title, bool force) {
+	auto it = sub_tsk.cbegin();
+	while(it != sub_tsk.cend()) {
+        	if(title == it->getTitle()) {
+	       	if(!deletable(*it, force)) {return false;}
+	            sub_tsk.erase(it);
+	            return true;
+         	}
+         	it++;
+    	}
+    	return false;
+}
+
+bool kb::SuperTask::markSubTask(index i) {
+	auto* t = this->getTask(i);
+	if(t == nullptr) {return false;}
+
+	return t->Mark(true);
+}
+
+void kb::SuperTask::unmarkSubTask(index i) {
+	auto* t = this->getTask(i);
+	if(t == nullptr) {return;}
+
+	return t->unMark();
 }
 
 bool kb::SuperTask::Markable() const {
-    if(marked) {return true;}
-    for(auto& t: sub_tsk) {
-        if (!t.getMark()) {
-            return false;
-        }
-    }
-    return true;
+	if(marked) {return true;}
+	for(auto& t: sub_tsk) {
+        	if (!t.getMark()) {
+            	return false;
+         	}
+    	}
+     	return true;
 }
 
 bool kb::SuperTask::Mark(bool force) {
-    if(force) {marked = true; return true;}
+	if(force) {marked = true; return true;}
 
-    if(!this->Markable()) {return false;}
-    this->marked = true;
-    return true;
+	if(!this->Markable()) {return false;}
+	this->marked = true;
+	return true;
 }
 
 bool kb::SuperTask::switchMark(bool force) {
-    if(marked) {
-        unMark();
-        return false;
-    }
-    else { return Mark(force); }
+	if(marked) {
+	        unMark();
+	        return false;
+     	} else { return Mark(force); }
 }

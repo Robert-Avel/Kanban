@@ -77,30 +77,6 @@ std::pair<size_t, kb::Frame*> kb::MasterFrame::newFrame(std::string name) {
     return getFrame(name);
 }
 
-kb::Status kb::MasterFrame::switchMarkSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
-    auto fr = getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    auto st = fr->getSuperTask(super_tsk_index);
-    if(st == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    if(!st->Markable() && !force) {return INCOMPLETE_MARK;}
-    return st->switchMark(force) ? SET_ON : SET_OFF;
-}
-
-kb::Status kb::MasterFrame::switchMarkSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index) {
-    auto fr = getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    auto st = fr->getSuperTask(super_tsk_index);
-    if(st == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    auto sbt = st->getTask(sub_tsk_index);
-    if(sbt == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    return sbt->switchMark(true) ? SET_ON : SET_OFF;
-}
-
 kb::Status kb::MasterFrame::deleteFrame(size_t frame_index, bool force) {
     auto it = frames.begin();
     size_t i = 0;
@@ -112,25 +88,4 @@ kb::Status kb::MasterFrame::deleteFrame(size_t frame_index, bool force) {
         it++; i++;
     }
     return FRAME_NOT_FOUND;
-}
-
-kb::Status kb::MasterFrame::deleteSuperTask(size_t frame_index, size_t super_tsk_index, bool force) {
-    auto fr = getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    auto st = fr->getSuperTask(super_tsk_index);
-    if(st == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    return fr->deleteSuperTask(super_tsk_index, force) ? SUCCESS : INCOMPLETE_MARK;
-}
-
-
-kb::Status kb::MasterFrame::deleteSubTask(size_t frame_index, size_t super_tsk_index, size_t sub_tsk_index) {
-    auto fr = getFrame(frame_index);
-    if(fr == nullptr) {return FRAME_NOT_FOUND;}
-
-    auto st = fr->getSuperTask(super_tsk_index);
-    if(st == nullptr) {return SUPER_TASK_NOT_FOUND;}
-
-    return st->deleteSubTask(super_tsk_index) ? SUCCESS : TASK_NOT_FOUND;
 }
