@@ -32,9 +32,6 @@ namespace kb {
 	            bool deleteSubTask(index index, bool force);
 	            bool deleteSubTask(std::string title, bool force);
 
-			bool markSubTask(index i);
-			void unmarkSubTask(index i);
-
 	            std::pair<index, Task*> getTask(std::string title);
 	            Task* getTask(index index);
 

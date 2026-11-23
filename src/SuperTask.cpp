@@ -65,20 +65,6 @@ bool kb::SuperTask::deleteSubTask(std::string title, bool force) {
     	return false;
 }
 
-bool kb::SuperTask::markSubTask(index i) {
-	auto* t = this->getTask(i);
-	if(t == nullptr) {return false;}
-
-	return t->Mark(true);
-}
-
-void kb::SuperTask::unmarkSubTask(index i) {
-	auto* t = this->getTask(i);
-	if(t == nullptr) {return;}
-
-	return t->unMark();
-}
-
 bool kb::SuperTask::Markable() const {
 	if(marked) {return true;}
 	for(auto& t: sub_tsk) {
