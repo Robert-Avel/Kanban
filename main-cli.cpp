@@ -1,12 +1,7 @@
 #include "MasterFrame.hpp"
-#include <cstddef>
-#include <iostream>
 #include <string>
 #include <CerealShell/CerealShell.hpp>
-#include <fstream>
-#include <ios>
-#include "Data.hpp"
-#include "cli-wrapper.hpp"
+#include "cli-interface/cli-wrapper.hpp"
 
 std::string translateStatus(kb::Status s) {
     switch (s) {

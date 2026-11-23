@@ -7,26 +7,10 @@
 #include <sstream>
 #include <string>
 #include <variant>
-
-static std::string MARKDED = "[X]";
-static std::string UNMARKDED = "[ ]";
-static std::string SEPARATOR = " | ";
-
-static std::string STATUS[] = {
-	"Desmarcado",
-      "Marcado",
-      "Sucesso",
-      "Falha",
-      "Tarefa não encontrada",
-      "Super Tarefa não encontrada",
-      "Quadro não encontrado",
-      "Duplicado",
-      "Sub Tarefas incompletas",
-      "Sem entrada"
-};
+#include "cli-interface/cli-wrapper.hpp"
 
 
-std::string insertTab(uint16_t level) {
+static std::string insertTab(uint16_t level) {
 	return std::string(level, '\t');
 }
 

@@ -1,3 +1,6 @@
+#ifndef KANBAN_HPP
+#define KANBAN_HPP
+
 #include "MasterFrame.hpp"
 #include "Payload.hpp"
 #include <string>
@@ -47,3 +50,5 @@ namespace kb
             auto end() const {return this->kanban.end();}
     };
 };
+
+#endif
