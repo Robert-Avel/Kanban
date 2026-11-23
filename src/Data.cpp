@@ -131,3 +131,27 @@ std::optional<kb::MasterFrame> kb::Data1::load(std::ifstream& f, std::string& fi
 
     return kb::Data1::popMasterFrame(d);
 }
+
+
+bool kb::Data2::save(std::ofstream& f, kb::MasterFrame& mfrm) {
+    if(!f) {return false;}
+
+    auto d = kb::Data1::appendMasterFrame(mfrm);
+    auto dsize = d.size();
+    f.write((char*) &dsize, dsize);
+    f.write((char*) d.data(), d.size());
+    return true;
+}
+
+std::optional<kb::MasterFrame> kb::Data2::load(std::ifstream& f, std::string& filepath) {
+    if(!f) {return {};}
+
+    size_t s;
+    f.read((char*) &s, s);
+
+    ByteS d;
+    d.resize(s);
+    f.read((char*) d.data(), s);
+
+    return kb::Data1::popMasterFrame(d);
+}
