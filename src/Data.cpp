@@ -2,7 +2,7 @@
 #include <ByteS.hpp>
 #include <cstddef>
 #include <iostream>
-#include <filesystem>
+#include <vector>
 
 
 ByteS kb::Data1::appendTask(kb::Task& tsk) {
@@ -82,7 +82,7 @@ std::optional<kb::SuperTask> kb::Data1::popSuperTask(ByteS& d) {
 
 std::optional<kb::Frame> kb::Data1::popFrame(ByteS& d) {
     std::string name;
-    if(!d.pop(name)) {std::cout << "NOK Frame"; return {};}
+    if(!d.pop(name)) {std::cout << ""; return {};}
 
     kb::Frame output{name};
 
@@ -113,45 +113,41 @@ std::optional<kb::MasterFrame> kb::Data1::popMasterFrame(ByteS& d) {
 }
 
 
-bool kb::Data1::save(std::ofstream& f, kb::MasterFrame& mfrm) {
-    if(!f) {return false;}
+size_t kb::DataManager::getLastVersion() {return kb::DataManager::version_wrapper.size() - 1;}
 
-    auto d = kb::Data1::appendMasterFrame(mfrm);
-    f.write((char*) d.data(), d.size());
-    return true;
+
+bool kb::DataManager::save(std::ofstream& f, kb::MasterFrame& mfrm) {
+	if(!f) {return false;}
+
+	size_t last_version = kb::DataManager::getLastVersion();
+	f.write((char*) &last_version, sizeof(size_t));
+	std::cout << "Last: " << last_version << '\n';
+
+	auto d = kb::Data1::appendMasterFrame(mfrm);
+	auto dsize = d.size();
+	std::cout << dsize << '\n';
+	f.write((char*) &dsize, sizeof(dsize));
+	f.write((char*) d.data(), d.size());
+	return true;
 }
 
-std::optional<kb::MasterFrame> kb::Data1::load(std::ifstream& f, std::string& filepath) {
-    if(!f) {return {};}
+std::optional<kb::MasterFrame> kb::DataManager::load(std::ifstream& f, std::string& filepath) {
+	if(!f) {return {};}
 
-    size_t s = std::filesystem::file_size(filepath);
-    ByteS d;
-    d.resize(s);
-    f.read((char*) d.data(), s);
+	size_t version = {0};
+	f.read((char*) &version, sizeof(size_t));
 
-    return kb::Data1::popMasterFrame(d);
-}
+	size_t s = {0};
+	f.read((char*) &s, sizeof(s));
+	std::cout << s << '\n';
 
+	ByteS d;
+	d.resize(s);
+	f.read((char*) d.data(), s);
 
-bool kb::Data2::save(std::ofstream& f, kb::MasterFrame& mfrm) {
-    if(!f) {return false;}
+	if(version > version_wrapper.size()) {return {};}
+	LoadOverride loader = version_wrapper[version].first;
+	if (loader == nullptr) {return {};}
 
-    auto d = kb::Data1::appendMasterFrame(mfrm);
-    auto dsize = d.size();
-    f.write((char*) &dsize, dsize);
-    f.write((char*) d.data(), d.size());
-    return true;
-}
-
-std::optional<kb::MasterFrame> kb::Data2::load(std::ifstream& f, std::string& filepath) {
-    if(!f) {return {};}
-
-    size_t s;
-    f.read((char*) &s, s);
-
-    ByteS d;
-    d.resize(s);
-    f.read((char*) d.data(), s);
-
-    return kb::Data1::popMasterFrame(d);
+	return kb::Data1::popMasterFrame(d);
 }

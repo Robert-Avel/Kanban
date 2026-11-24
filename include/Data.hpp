@@ -6,8 +6,14 @@
 #include <MasterFrame.hpp>
 #include <fstream>
 #include <optional>
+#include <utility>
+#include <vector>
 
+using UpdateOverride = void (*) (kb::MasterFrame& mfrm);
+using LoadOverride = std::optional<kb::MasterFrame> (*) (ByteS& d);
+using OverridePair = std::pair<LoadOverride, UpdateOverride>;
 //Criar classe de sobreposição de varias versões de dados
+
 
 namespace kb {
 	namespace Data1 {
@@ -20,15 +26,19 @@ namespace kb {
 	        std::optional<kb::SuperTask> popSuperTask(ByteS& d);
 	        std::optional<kb::Frame> popFrame(ByteS& d);
 	        std::optional<kb::MasterFrame> popMasterFrame(ByteS& d);
-
-	        bool save(std::ofstream& f,kb::MasterFrame& mfrm);
-	        std::optional<kb::MasterFrame> load(std::ifstream& f, std::string& filepath);
 	};
 
-	namespace Data2 {
-		  bool save(std::ofstream& f,kb::MasterFrame& mfrm);
-		  std::optional<kb::MasterFrame> load(std::ifstream& f, std::string& filepath);
-	}
+
+	namespace DataManager {
+		static const std::vector<OverridePair> version_wrapper = {
+			{nullptr, nullptr}, //versão zero (nulo)
+			{Data1::popMasterFrame, nullptr} //primeira versão não possui atualização
+		};
+
+		size_t getLastVersion();
+		bool save(std::ofstream& f,kb::MasterFrame& mfrm);
+		std::optional<kb::MasterFrame> load(std::ifstream& f, std::string& filepath);
+	};
 };
 
 #endif

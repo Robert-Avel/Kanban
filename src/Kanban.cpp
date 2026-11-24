@@ -18,7 +18,7 @@ kb::BasePayLoad kb::Kanban::Open(std::string name) {
     file.open(final_path, std::ios::in | std::ios::app | std::ios::binary);
     if(!file) {return {FAIL, final_path, "NO_NAME"};}
 
-    auto buffer = kb::Data1::load(file, final_path);
+    auto buffer = kb::DataManager::load(file, final_path);
     file.close();
 
     if(buffer.has_value()) {
@@ -40,7 +40,7 @@ kb::BasePayLoad kb::Kanban::Save() {
       auto final_path = this->app_data_path + (name.empty() ? kb_name : name) + DATA_FILE_EXT;
       file.open(final_path , std::ios::out | std::ios::binary | std::ios::trunc);
 
-      kb::Data1::save(file, this->kanban);
+      kb::DataManager::save(file, this->kanban);
       file.close();
       return {SUCCESS, this->kanban};
 }
